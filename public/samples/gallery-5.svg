@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="1200" viewBox="0 0 900 1200">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#7A1E2C"/><stop offset="1" stop-color="#4E111B"/>
+    </linearGradient>
+    <pattern id="p" width="60" height="60" patternUnits="userSpaceOnUse">
+      <path d="M30 6l6 24-6 24-6-24z" fill="#F1D88E" fill-opacity=".06"/>
+    </pattern>
+  </defs>
+  <rect width="900" height="1200" fill="url(#bg)"/>
+  <rect width="900" height="1200" fill="url(#p)"/>
+  <rect x="24" y="24" width="852" height="1152" rx="18" fill="none" stroke="#F1D88E" stroke-opacity=".35" stroke-width="2"/>
+  <g transform="translate(396 506) scale(4.5)" fill="none" stroke="#F1D88E" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M3 8.5h18l-1.6-4.5H4.6z"/><path d="M4.5 8.5V20h15V8.5"/><path d="M9.5 20v-6h5v6"/>
+    <path d="M3 8.5c0 1.4 1 2.3 2.3 2.3S7.6 9.9 7.6 8.5c0 1.4 1 2.3 2.2 2.3S12 9.9 12 8.5c0 1.4 1 2.3 2.2 2.3s2.2-.9 2.2-2.3c0 1.4 1 2.3 2.3 2.3S21 9.9 21 8.5"/>
+  </g>
+  <g font-family="Georgia, 'Times New Roman', serif" text-anchor="middle">
+    <text x="450" y="670" font-size="40" fill="#F1D88E">Workshop</text>
+    <text x="450" y="720" font-size="24" letter-spacing="5" fill="#E9D6A8">SAMPLE PHOTO · UPLOAD FROM ADMIN</text>
+  </g>
+</svg>
