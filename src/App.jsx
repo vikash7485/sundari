@@ -5,6 +5,7 @@ import { DataProvider } from './data/DataContext'
 import Header from './components/Header'
 import Footer from './components/Footer'
 import FloatingButtons from './components/FloatingButtons'
+import { LoadNotice } from './components/LoadError'
 import Home from './pages/Home'
 import Collection from './pages/Collection'
 import ProductDetail from './pages/ProductDetail'
@@ -28,6 +29,7 @@ function SiteLayout() {
   return (
     <>
       <Header />
+      <LoadNotice />
       <main className="min-h-[60vh]">
         <Outlet />
       </main>

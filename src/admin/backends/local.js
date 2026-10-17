@@ -55,6 +55,8 @@ export async function uploadImage(blob) {
 
 export async function removeFiles() {}
 
+export async function removeByUrl() {}
+
 const update = (fn) => writeDb(fn(structuredClone(readDb())))
 
 // ---------- Products ----------
@@ -96,11 +98,11 @@ export async function saveCategory(cat, isNew) {
   return cat
 }
 
-export async function deleteCategory(slug) {
+export async function deleteCategory(cat) {
   update((db) => ({
     ...db,
-    categories: db.categories.filter((c) => c.slug !== slug),
-    products: db.products.map((p) => (p.category === slug ? { ...p, category: null } : p)),
+    categories: db.categories.filter((c) => c.slug !== cat.slug),
+    products: db.products.map((p) => (p.category === cat.slug ? { ...p, category: null } : p)),
   }))
 }
 
@@ -130,6 +132,12 @@ export async function deleteGalleryItem(item) {
 
 export async function deleteSampleGallery() {
   update((db) => ({ ...db, gallery: db.gallery.filter((g) => !g.is_sample) }))
+}
+
+// ---------- Backup ----------
+export async function exportBackup() {
+  const { categories, products, gallery, settings } = readDb()
+  return structuredClone({ categories, products, gallery, settings })
 }
 
 export async function resetDemo() {

@@ -3,6 +3,7 @@ import { AdminPage, Panel, Spinner, useToast } from './ui'
 import { adminApi } from './adminApi'
 import Icon from '../components/Icon'
 import CategoryIcon from '../components/CategoryIcon'
+import SafeImg from '../components/SafeImg'
 import { useData } from '../data/DataContext'
 import { compressImage } from '../lib/image'
 import { slugify } from '../lib/format'
@@ -35,9 +36,10 @@ function CategoryRow({ cat, count, index, total, onMove, busy, setBusy }) {
     const msg = count
       ? `Delete “${cat.name_en}”? Its ${count} product(s) will stay on the website without a category.`
       : `Delete “${cat.name_en}”?`
-    if (confirm(msg)) run('delete', () => adminApi.deleteCategory(cat.slug), 'Category deleted')
+    if (confirm(msg)) run('delete', () => adminApi.deleteCategory(cat), 'Category deleted')
   }
 
+  // The old photo file is removed only after the category points to the new one.
   const setImage = (file) =>
     run(
       'image',
@@ -45,8 +47,19 @@ function CategoryRow({ cat, count, index, total, onMove, busy, setBusy }) {
         const c = await compressImage(file, { full: 400, thumb: 200 })
         const up = await adminApi.uploadImage(c.full.blob, 'categories', c.full.ext)
         await adminApi.saveCategory({ ...cat, image: up.url }, false)
+        if (cat.image) await adminApi.removeByUrl([cat.image])
       },
       'Category photo updated',
+    )
+
+  const removeImage = () =>
+    run(
+      'img',
+      async () => {
+        await adminApi.saveCategory({ ...cat, image: null }, false)
+        await adminApi.removeByUrl([cat.image])
+      },
+      'Photo removed',
     )
 
   const isBusy = busy === cat.slug
@@ -54,7 +67,7 @@ function CategoryRow({ cat, count, index, total, onMove, busy, setBusy }) {
   return (
     <li className="grid grid-cols-[auto_minmax(0,1fr)] gap-3 p-3 sm:grid-cols-[auto_minmax(0,1fr)_auto] sm:items-center sm:p-4">
       <label className="group relative grid size-16 cursor-pointer place-items-center overflow-hidden rounded-full bg-gold-pale text-gold-dark ring-1 ring-gold/50" title="Change photo">
-        {cat.image ? <img src={cat.image} alt="" className="size-full object-cover" /> : <CategoryIcon slug={cat.slug} className="size-8" />}
+        <SafeImg src={cat.image} className="size-full object-cover" fallback={<CategoryIcon slug={cat.slug} className="size-8" />} />
         <span className="absolute inset-0 grid place-items-center bg-black/45 text-white opacity-0 transition group-hover:opacity-100">
           <Icon name="upload" className="size-5" />
         </span>
@@ -68,7 +81,7 @@ function CategoryRow({ cat, count, index, total, onMove, busy, setBusy }) {
           {cat.image && (
             <>
               {' · '}
-              <button type="button" className="text-maroon underline" onClick={() => run('img', () => adminApi.saveCategory({ ...cat, image: null }, false), 'Photo removed')}>
+              <button type="button" className="text-maroon underline" onClick={removeImage}>
                 remove photo (use icon)
               </button>
             </>

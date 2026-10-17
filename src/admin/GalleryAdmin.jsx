@@ -3,6 +3,7 @@ import { AdminPage, Panel, useToast } from './ui'
 import { DropZone, filesToItems } from './ImageUploader'
 import { adminApi, uploadVariants } from './adminApi'
 import Icon from '../components/Icon'
+import SafeImg from '../components/SafeImg'
 import { useData } from '../data/DataContext'
 
 function Photo({ g, onDelete, onCaption }) {
@@ -10,7 +11,7 @@ function Photo({ g, onDelete, onCaption }) {
   return (
     <li className="overflow-hidden rounded-xl border border-gold/25 bg-white shadow-soft">
       <div className="relative aspect-[4/3] bg-ivory">
-        <img src={g.thumb_url || g.full_url} alt="" loading="lazy" className="size-full object-cover" />
+        <SafeImg src={g.thumb_url || g.full_url} loading="lazy" className="size-full object-cover" />
         {g.is_sample && <span className="absolute left-2 top-2 rounded-full bg-ink/70 px-2 py-0.5 text-[0.62rem] text-white">SAMPLE</span>}
         <button
           type="button"
@@ -46,12 +47,11 @@ export default function GalleryAdmin() {
 
   const upload = async (fileList) => {
     setProgress('Compressing…')
+    let added = 0
     try {
       const items = await filesToItems(fileList, 30, toast)
-      let n = 0
       for (const it of items) {
-        n++
-        setProgress(`Uploading ${n} of ${items.length}…`)
+        setProgress(`Uploading ${added + 1} of ${items.length}…`)
         const v = await uploadVariants(it.compressed, 'gallery')
         await adminApi.addGalleryItem({
           full_url: v.full,
@@ -63,12 +63,13 @@ export default function GalleryAdmin() {
           caption: null,
           is_sample: false,
         })
+        added++
       }
-      await refresh()
-      if (items.length) toast(`${items.length} photo${items.length > 1 ? 's' : ''} added to the gallery`)
+      if (added) toast(`${added} photo${added > 1 ? 's' : ''} added to the gallery`)
     } catch (e) {
-      toast(e.message, 'error')
+      toast(added ? `${added} photo(s) added, then: ${e.message}` : e.message, 'error')
     } finally {
+      if (added) await refresh() // show what was added even if a later photo failed
       setProgress('')
     }
   }

@@ -1,5 +1,6 @@
 import { Link } from 'react-router'
 import HeroArt from './HeroArt'
+import SafeImg from './SafeImg'
 import { WhatsAppIcon } from './Icon'
 import Icon from './Icon'
 import { useLang } from '../i18n/LanguageContext'
@@ -15,11 +16,7 @@ export default function Hero() {
   return (
     <section className="relative isolate overflow-hidden bg-maroon-deep text-white">
       <div className="absolute inset-0 -z-10">
-        {hero ? (
-          <img src={hero} alt="" fetchPriority="high" decoding="async" className="size-full object-cover object-center" />
-        ) : (
-          <HeroArt />
-        )}
+        <SafeImg src={hero} fetchPriority="high" decoding="async" className="size-full object-cover object-center" fallback={<HeroArt />} />
         <div className="absolute inset-0 bg-linear-to-t from-maroon-deep via-maroon-deep/75 via-45% to-transparent lg:bg-linear-to-r lg:from-maroon-deep/95 lg:via-maroon-deep/60 lg:via-50% lg:to-transparent" />
       </div>
 

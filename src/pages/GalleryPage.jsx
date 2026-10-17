@@ -1,12 +1,13 @@
 import GalleryGrid from '../components/GalleryGrid'
 import { EmptyState } from '../components/ProductCard'
+import LoadError from '../components/LoadError'
 import { useLang } from '../i18n/LanguageContext'
 import { useData } from '../data/DataContext'
 import { useSeo } from '../lib/seo'
 
 export default function GalleryPage() {
   const { t } = useLang()
-  const { gallery, status } = useData()
+  const { gallery, status, failed } = useData()
   useSeo({
     title: 'Shop Gallery',
     description: 'Photos of Sundari Jewellers shop and display counters at Mahadev Chowk, Tajpur Road, Samastipur.',
@@ -24,6 +25,8 @@ export default function GalleryPage() {
       <div className="container-x mt-8">
         {gallery.length ? (
           <GalleryGrid items={gallery} />
+        ) : failed.includes('gallery') ? (
+          <LoadError title={t('common.photosFailed')} />
         ) : (
           status !== 'loading' && <EmptyState title={t('gallery.empty')} />
         )}

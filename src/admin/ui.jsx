@@ -1,5 +1,6 @@
 import { createContext, useCallback, useContext, useState } from 'react'
 import Icon from '../components/Icon'
+import SafeImg from '../components/SafeImg'
 
 // ---------- Toasts ----------
 const ToastContext = createContext(() => {})
@@ -110,11 +111,16 @@ export function SaveButton({ busy, children = 'Save', className = '', ...rest })
 }
 
 export function Thumb({ src, className = 'size-14' }) {
-  return src ? (
-    <img src={src} alt="" loading="lazy" className={`${className} shrink-0 rounded-lg border border-gold/25 bg-ivory object-cover`} />
-  ) : (
-    <span className={`${className} grid shrink-0 place-items-center rounded-lg border border-gold/25 bg-ivory text-gold`}>
-      <Icon name="image" className="size-5" />
-    </span>
+  return (
+    <SafeImg
+      src={src}
+      loading="lazy"
+      className={`${className} shrink-0 rounded-lg border border-gold/25 bg-ivory object-cover`}
+      fallback={
+        <span className={`${className} grid shrink-0 place-items-center rounded-lg border border-gold/25 bg-ivory text-gold`}>
+          <Icon name="image" className="size-5" />
+        </span>
+      }
+    />
   )
 }

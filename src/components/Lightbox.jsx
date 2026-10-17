@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import Icon from './Icon'
+import SafeImg, { MissingImage } from './SafeImg'
 
 /**
  * Full-screen image viewer: swipe / arrow keys to move, tap to zoom, drag to pan.
@@ -102,7 +103,7 @@ export default function Lightbox({ images, index, onIndex, onClose }) {
         onMouseMove={(e) => zoom && setOrigin(originFrom(e.currentTarget, e.clientX, e.clientY))}
       >
         <div className="absolute inset-0 grid place-items-center p-2 sm:p-8">
-          <img
+          <SafeImg
             key={img.src}
             src={img.src}
             alt={img.alt || ''}
@@ -110,6 +111,7 @@ export default function Lightbox({ images, index, onIndex, onClose }) {
             draggable={false}
             className={`max-h-full max-w-full animate-fade-in rounded-md object-contain transition-transform duration-300 ${zoom ? 'cursor-zoom-out' : 'cursor-zoom-in'}`}
             style={{ transform: zoom ? 'scale(2.5)' : 'none', transformOrigin: origin }}
+            fallback={<MissingImage className="size-40 rounded-md" />}
           />
         </div>
         {many && (
@@ -144,7 +146,7 @@ export default function Lightbox({ images, index, onIndex, onClose }) {
               className={`size-12 shrink-0 overflow-hidden rounded-md ring-2 transition ${i === index ? 'ring-gold' : 'opacity-50 ring-transparent hover:opacity-90'}`}
               aria-label={`Image ${i + 1}`}
             >
-              <img src={im.thumb || im.src} alt="" className="size-full object-cover" loading="lazy" />
+              <SafeImg src={im.thumb || im.src} className="size-full object-cover" loading="lazy" />
             </button>
           ))}
         </div>

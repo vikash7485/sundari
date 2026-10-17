@@ -56,6 +56,8 @@ Any static host works. Easiest: **Netlify** or **Vercel** (both free).
 
 - Build command: `npm run build` · Output folder: `dist`
 - Add the same `VITE_…` values from `.env` as environment variables in the host's settings.
+  `npm run build` **stops with an error** if the Supabase keys are missing, so the live site can never
+  end up in demo mode by mistake. To build the demo version on purpose, use `npm run build:demo`.
 - `public/_redirects` (Netlify) and `vercel.json` (Vercel) are included so links like `/product/1005` work.
 - Set `VITE_SITE_URL` to the real domain – it's used for the WhatsApp/Facebook preview image,
   Google's shop info and `sitemap.xml`.
@@ -77,6 +79,16 @@ After going live:
 | Shop photos | **Gallery** – select many photos at once |
 | Timings, “Why Choose Us”, banner, logo | **Settings** |
 | Remove all sample items | **Home (Dashboard) → Delete samples** |
+| Backup (once a month) | **Home (Dashboard) → Download backup** – save the file in Google Drive |
+
+**If the database can't be reached** (no internet, or Supabase is down/paused):
+
+- Visitors see the last copy their phone saved, or a “Could not load – Try again / WhatsApp” message.
+  The site retries by itself when the internet comes back. Contact, map, WhatsApp and call buttons always work.
+- A photo that can't load shows a neat placeholder instead of a broken image.
+- `/admin` shows a red banner and **pauses saving** until everything has loaded (tap *Retry*), so an
+  empty or old list is never saved over the real data.
+- Replacing or deleting a photo also deletes the old file from storage, so storage doesn't fill up with unused photos.
 
 Every photo is resized and converted to **WebP** on the phone before upload (a 5 MB camera photo
 becomes ~150 KB), and the site lazy-loads images, so pages stay fast on mobile data.

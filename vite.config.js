@@ -34,8 +34,16 @@ function siteUrl(env) {
   }
 }
 
-export default defineConfig(({ mode }) => {
+export default defineConfig(({ command, mode }) => {
   const env = loadEnv(mode, process.cwd(), 'VITE_')
+  // A live build without Supabase keys silently runs in demo mode: the owner's products would be
+  // saved only on their own phone and visitors would see samples. `npm run build:demo` skips this check.
+  if (command === 'build' && mode === 'production' && !(env.VITE_SUPABASE_URL && env.VITE_SUPABASE_ANON_KEY)) {
+    throw new Error(
+      'VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY are not set, so this build would run in demo mode. ' +
+        'Add them to .env (or your hosting settings) – see README. To build the demo on purpose, run "npm run build:demo".',
+    )
+  }
   return {
     plugins: [siteUrl(env), react(), tailwindcss()],
   }

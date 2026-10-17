@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import Icon from '../components/Icon'
+import SafeImg from '../components/SafeImg'
 import { compressImage, formatBytes } from '../lib/image'
 import { Spinner, useToast } from './ui'
 
@@ -89,7 +90,7 @@ export default function ImageUploader({ items, setItems, max = 5 }) {
       <div className="grid grid-cols-3 gap-2.5 sm:grid-cols-5">
         {items.map((im, i) => (
           <div key={im.id} className="group relative aspect-square overflow-hidden rounded-xl border border-gold/30 bg-ivory">
-            <img src={im.preview} alt="" className="size-full object-cover" />
+            <SafeImg src={im.preview} className="size-full object-cover" />
             {i === 0 && (
               <span className="absolute left-1.5 top-1.5 rounded-full bg-maroon px-2 py-0.5 text-[0.6rem] font-semibold text-white">COVER</span>
             )}

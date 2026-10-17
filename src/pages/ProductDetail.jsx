@@ -3,6 +3,8 @@ import { Link, useParams } from 'react-router'
 import ProductCard, { EmptyState, PriceTag, PurityBadge } from '../components/ProductCard'
 import CategoryIcon from '../components/CategoryIcon'
 import Lightbox from '../components/Lightbox'
+import LoadError from '../components/LoadError'
+import SafeImg from '../components/SafeImg'
 import Icon, { WhatsAppIcon } from '../components/Icon'
 import Reveal from '../components/Reveal'
 import { useLang } from '../i18n/LanguageContext'
@@ -55,7 +57,7 @@ function ImageGallery({ images, title, category, onOpen }) {
               className="relative aspect-square w-full shrink-0 snap-center cursor-zoom-in overflow-hidden"
               aria-label={`${title} – ${i + 1}`}
             >
-              <img
+              <SafeImg
                 src={im.full || im.thumb}
                 alt={`${title}${images.length > 1 ? ` – ${i + 1}` : ''}`}
                 loading={i === 0 ? 'eager' : 'lazy'}
@@ -107,7 +109,7 @@ function ImageGallery({ images, title, category, onOpen }) {
               className={`size-16 shrink-0 overflow-hidden rounded-xl border-2 transition sm:size-20 ${i === active ? 'border-maroon' : 'border-gold/30 opacity-70 hover:opacity-100'}`}
               aria-label={`Image ${i + 1}`}
             >
-              <img src={im.thumb || im.full} alt="" className="size-full object-cover" loading="lazy" />
+              <SafeImg src={im.thumb || im.full} className="size-full object-cover" loading="lazy" />
             </button>
           ))}
         </div>
@@ -119,7 +121,7 @@ function ImageGallery({ images, title, category, onOpen }) {
 export default function ProductDetail() {
   const { id } = useParams()
   const { t, pick, L } = useLang()
-  const { products, categoryBySlug, status } = useData()
+  const { products, categoryBySlug, status, failed } = useData()
   const [lightbox, setLightbox] = useState(null)
   const [copied, setCopied] = useState(false)
   const p = products.find((x) => String(x.id) === String(id))
@@ -144,6 +146,13 @@ export default function ProductDetail() {
             <div className="h-8 w-3/4 animate-pulse rounded bg-ivory" />
             <div className="h-6 w-1/3 animate-pulse rounded bg-ivory" />
           </div>
+        </div>
+      )
+    }
+    if (failed.includes('products')) {
+      return (
+        <div className="container-x py-20">
+          <LoadError title={t('common.productsFailed')} />
         </div>
       )
     }

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link, Navigate, NavLink, Route, Routes } from 'react-router'
-import { adminApi, isDemo } from './adminApi'
+import { adminApi, isDemo, setWriteBlock } from './adminApi'
+import { useData } from '../data/DataContext'
 import { ToastProvider, Spinner } from './ui'
 import Login from './Login'
 import Dashboard from './Dashboard'
@@ -42,6 +43,42 @@ function DemoBanner() {
   return (
     <div className="bg-gold-pale px-4 py-2 text-center text-[0.8rem] text-ink">
       <strong>Demo mode:</strong> changes are saved only in this browser. Connect Supabase (see README) so every visitor sees your products.
+    </div>
+  )
+}
+
+const WRITE_BLOCK = {
+  loading: 'Your website data is still loading – please wait a moment and try again.',
+  error: 'Saving is paused because your website data could not be loaded. Tap “Retry” at the top, then try again.',
+}
+
+// Until every list has loaded from the database, the admin shows empty/old lists –
+// saving then could overwrite real data, so saves are paused (see setWriteBlock).
+function useWriteGuard() {
+  const { status } = useData()
+  useEffect(() => {
+    setWriteBlock(WRITE_BLOCK[status])
+    return () => setWriteBlock(null)
+  }, [status])
+}
+
+function DataErrorBanner() {
+  const { status, refresh } = useData()
+  const [busy, setBusy] = useState(false)
+  if (status !== 'error' && !busy) return null
+  const retry = async () => {
+    setBusy(true)
+    await refresh()
+    setBusy(false)
+  }
+  return (
+    <div role="alert" className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1.5 bg-red-50 px-4 py-2.5 text-center text-[0.85rem] text-red-800">
+      <span>
+        <strong>Could not load your website data</strong> (no internet, or Supabase is not reachable). Lists may be empty or old, so saving is paused.
+      </span>
+      <button type="button" onClick={retry} disabled={busy} className="btn btn-maroon px-3 py-1.5 text-xs">
+        {busy ? <Spinner className="size-3.5" /> : <Icon name="refresh" className="size-3.5" />} Retry
+      </button>
     </div>
   )
 }
@@ -100,6 +137,7 @@ function Layout({ user, children }) {
           </button>
         </header>
         <DemoBanner />
+        <DataErrorBanner />
         <main>{children}</main>
       </div>
 
@@ -134,21 +172,32 @@ function Layout({ user, children }) {
 
 export default function AdminApp() {
   const [user, setUser] = useState(undefined) // undefined = still checking
+  const [fatal, setFatal] = useState(null)
   useNoIndex()
+  useWriteGuard()
 
   useEffect(() => {
     let unsub
     let alive = true
-    adminApi.getUser().then((u) => alive && setUser(u))
-    adminApi.onAuthChange((u) => setUser(u)).then((fn) => {
-      unsub = fn
-      if (!alive) fn()
-    })
+    adminApi
+      .getUser()
+      .then((u) => alive && setUser(u))
+      .catch((e) => alive && setFatal(e))
+    adminApi
+      .onAuthChange((u) => setUser(u))
+      .then((fn) => {
+        unsub = fn
+        if (!alive) fn()
+      })
+      .catch(() => {}) // getUser() reports the same failure
     return () => {
       alive = false
       unsub?.()
     }
   }, [])
+
+  // e.g. the admin files could not be downloaded – the ErrorBoundary shows a reload screen
+  if (fatal) throw fatal
 
   if (user === undefined) {
     return (

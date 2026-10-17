@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { useSearchParams } from 'react-router'
 import ProductCard, { EmptyState, ProductCardSkeleton } from '../components/ProductCard'
 import PriceRange from '../components/PriceRange'
+import LoadError from '../components/LoadError'
 import Icon, { WhatsAppIcon } from '../components/Icon'
 import { useLang } from '../i18n/LanguageContext'
 import { useData } from '../data/DataContext'
@@ -94,7 +95,7 @@ function FilterPanel({ f, toggle, update, categoryOptions, priceMax, priceStep }
 
 export default function Collection() {
   const { t, pick, lang } = useLang()
-  const { products, categories, categoryBySlug, status } = useData()
+  const { products, categories, categoryBySlug, status, failed } = useData()
   const [sp, setSp] = useSearchParams()
   const [drawer, setDrawer] = useState(false)
   const [shown, setShown] = useState(PAGE)
@@ -321,7 +322,13 @@ export default function Collection() {
               : filtered.slice(0, shown).map((p) => <ProductCard key={p.id} product={p} />)}
           </div>
 
-          {status !== 'loading' && filtered.length === 0 && (
+          {failed.includes('products') && products.length === 0 && (
+            <div className="mt-6">
+              <LoadError title={t('common.productsFailed')} />
+            </div>
+          )}
+
+          {status !== 'loading' && filtered.length === 0 && !(failed.includes('products') && products.length === 0) && (
             <div className="mt-6">
               <EmptyState title={t('collection.noResults')} hint={t('collection.noResultsHint')}>
                 <div className="mt-5 flex flex-wrap justify-center gap-2">

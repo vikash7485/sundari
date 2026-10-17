@@ -1,6 +1,7 @@
 import { Link } from 'react-router'
 import Icon, { WhatsAppIcon } from './Icon'
 import CategoryIcon from './CategoryIcon'
+import SafeImg from './SafeImg'
 import { useLang } from '../i18n/LanguageContext'
 import { useData } from '../data/DataContext'
 import { formatPrice, formatWeight, isNew } from '../lib/format'
@@ -39,19 +40,18 @@ export default function ProductCard({ product }) {
     <article className="group card @container flex flex-col overflow-hidden transition duration-300 hover:-translate-y-1 hover:shadow-lift">
       <Link to={`/product/${product.id}`} className="flex flex-1 flex-col" aria-label={title}>
         <div className="relative aspect-square overflow-hidden bg-ivory">
-          {img ? (
-            <img
-              src={img.thumb || img.full}
-              alt={title}
-              loading="lazy"
-              decoding="async"
-              className="size-full object-cover transition duration-700 ease-out group-hover:scale-[1.06]"
-            />
-          ) : (
-            <div className="grid size-full place-items-center text-gold">
-              <CategoryIcon slug={product.category} className="size-16" />
-            </div>
-          )}
+          <SafeImg
+            src={img && (img.thumb || img.full)}
+            alt={title}
+            loading="lazy"
+            decoding="async"
+            className="size-full object-cover transition duration-700 ease-out group-hover:scale-[1.06]"
+            fallback={
+              <div className="grid size-full place-items-center text-gold">
+                <CategoryIcon slug={product.category} className="size-16" />
+              </div>
+            }
+          />
           <div className="absolute left-2 top-2 flex flex-col items-start gap-1">
             {fresh && (
               <span className="rounded-full bg-maroon px-2 py-0.5 text-[0.65rem] font-semibold tracking-wider text-white shadow">

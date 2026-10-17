@@ -136,6 +136,10 @@ export const STRINGS = {
     common: {
       loading: 'Loading…',
       error: 'Could not load data. Please check your internet and try again.',
+      stale: 'Could not get the latest updates – you may be seeing older information.',
+      productsFailed: 'Could not load our jewellery right now',
+      photosFailed: 'Could not load the photos right now',
+      askOnWhatsApp: 'Please try again, or message us on WhatsApp – we will send you photos and prices.',
       retry: 'Try again',
       required: 'Please fill this',
       or: 'or',
@@ -276,6 +280,10 @@ export const STRINGS = {
     common: {
       loading: 'लोड हो रहा है…',
       error: 'जानकारी लोड नहीं हो पाई। इंटरनेट जाँचें और फिर कोशिश करें।',
+      stale: 'ताज़ा जानकारी लोड नहीं हो पाई – हो सकता है पुरानी जानकारी दिख रही हो।',
+      productsFailed: 'अभी गहनों की जानकारी लोड नहीं हो पाई',
+      photosFailed: 'अभी फ़ोटो लोड नहीं हो पाईं',
+      askOnWhatsApp: 'फिर कोशिश करें, या व्हाट्सएप पर हमें मैसेज करें – हम फ़ोटो और कीमत भेज देंगे।',
       retry: 'फिर कोशिश करें',
       required: 'कृपया भरें',
       or: 'या',

@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { AdminPage, Field, Panel, SaveButton, Spinner, useToast } from './ui'
 import { adminApi } from './adminApi'
 import Icon, { WHY_ICONS } from '../components/Icon'
+import SafeImg from '../components/SafeImg'
 import { useData } from '../data/DataContext'
 import { DEFAULT_SETTINGS } from '../data/seed'
 import { compressImage } from '../lib/image'
@@ -11,14 +12,17 @@ function useSaver() {
   const { refresh } = useData()
   const toast = useToast()
   const [busy, setBusy] = useState(null)
+  // Resolves to true when the setting was saved.
   const save = async (key, value, message) => {
     setBusy(key)
     try {
       await adminApi.saveSetting(key, value)
       await refresh()
       toast(message)
+      return true
     } catch (e) {
       toast(e.message, 'error')
+      return false
     } finally {
       setBusy(null)
     }
@@ -145,12 +149,19 @@ function ImageSetting({ field, title, description, maxSize, aspect }) {
   const [uploading, setUploading] = useState(false)
   const current = settings.site[field]
 
+  // The old file is removed only after the setting points to the new one (or to nothing).
+  const replace = async (url, message) => {
+    if ((await save('site', { ...settings.site, [field]: url }, message)) && current) {
+      await adminApi.removeByUrl([current]).catch(() => {})
+    }
+  }
+
   const upload = async (file) => {
     setUploading(true)
     try {
       const c = await compressImage(file, { full: maxSize, thumb: 200 })
       const up = await adminApi.uploadImage(c.full.blob, 'site', c.full.ext)
-      await save('site', { ...settings.site, [field]: up.url }, `${title} updated`)
+      await replace(up.url, `${title} updated`)
     } catch (e) {
       toast(e.message, 'error')
     } finally {
@@ -162,7 +173,7 @@ function ImageSetting({ field, title, description, maxSize, aspect }) {
     <Panel title={title} description={description}>
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
         <div className={`${aspect} grid shrink-0 place-items-center overflow-hidden rounded-xl border border-gold/30 bg-ivory text-ink-soft`}>
-          {current ? <img src={current} alt="" className="size-full object-cover" /> : <span className="p-3 text-center text-xs">Not uploaded – using built-in design</span>}
+          {current ? <SafeImg src={current} className="size-full object-cover" /> : <span className="p-3 text-center text-xs">Not uploaded – using built-in design</span>}
         </div>
         <div className="flex flex-wrap gap-2">
           <label className="btn btn-maroon cursor-pointer">
@@ -171,7 +182,7 @@ function ImageSetting({ field, title, description, maxSize, aspect }) {
             <input type="file" accept="image/*" className="sr-only" onChange={(e) => e.target.files?.[0] && upload(e.target.files[0])} />
           </label>
           {current && (
-            <button type="button" onClick={() => save('site', { ...settings.site, [field]: null }, `${title} removed`)} className="btn btn-outline bg-white">
+            <button type="button" onClick={() => replace(null, `${title} removed`)} className="btn btn-outline bg-white">
               Remove
             </button>
           )}

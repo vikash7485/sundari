@@ -1,5 +1,6 @@
 import { Link } from 'react-router'
 import CategoryIcon from './CategoryIcon'
+import SafeImg from './SafeImg'
 import Icon from './Icon'
 import SectionHeading from './SectionHeading'
 import Reveal from './Reveal'
@@ -24,7 +25,9 @@ function Tile({ to, label, children, delay }) {
 
 export default function CategoryGrid() {
   const { t, pick } = useLang()
-  const { categories } = useData()
+  const { categories, status } = useData()
+
+  if (!categories.length && status !== 'loading') return null
 
   return (
     <section className="py-14 sm:py-20" aria-labelledby="cat-title">
@@ -41,11 +44,12 @@ export default function CategoryGrid() {
           <div className="grid auto-cols-[29%] grid-flow-col grid-rows-2 gap-2.5 sm:auto-cols-[19%] sm:gap-3 lg:grid-flow-row lg:grid-cols-7 lg:grid-rows-none">
             {categories.map((c, i) => (
               <Tile key={c.slug} to={`/collection?category=${encodeURIComponent(c.slug)}`} label={pick(c, 'name')} delay={Math.min(i, 7) * 40}>
-                {c.image ? (
-                  <img src={c.image} alt="" loading="lazy" className="size-full object-cover transition duration-700 group-hover:scale-110" />
-                ) : (
-                  <CategoryIcon slug={c.slug} className="size-10 transition duration-500 group-hover:scale-110 sm:size-11" />
-                )}
+                <SafeImg
+                  src={c.image}
+                  loading="lazy"
+                  className="size-full object-cover transition duration-700 group-hover:scale-110"
+                  fallback={<CategoryIcon slug={c.slug} className="size-10 transition duration-500 group-hover:scale-110 sm:size-11" />}
+                />
               </Tile>
             ))}
             <Tile to="/collection" label={t('categories.viewAll')} delay={280}>

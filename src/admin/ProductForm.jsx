@@ -54,7 +54,7 @@ export default function ProductForm() {
   const { id } = useParams()
   const navigate = useNavigate()
   const toast = useToast()
-  const { products, categories, refresh, status } = useData()
+  const { products, categories, refresh, status, failed } = useData()
   const existing = id ? products.find((p) => String(p.id) === id) : null
 
   const [f, setF] = useState(() => (existing ? toForm(existing) : EMPTY))
@@ -84,7 +84,15 @@ export default function ProductForm() {
   if (id && !existing) {
     return (
       <AdminPage title="Product">
-        {status === 'loading' ? <Spinner className="size-6 text-maroon" /> : <p>Product not found. <Link className="text-maroon underline" to="/admin/products">Back to products</Link></p>}
+        {status === 'loading' ? (
+          <Spinner className="size-6 text-maroon" />
+        ) : failed.includes('products') ? (
+          <p className="text-red-800">This product could not be loaded. It is not deleted – tap “Retry” at the top.</p>
+        ) : (
+          <p>
+            Product not found. <Link className="text-maroon underline" to="/admin/products">Back to products</Link>
+          </p>
+        )}
       </AdminPage>
     )
   }
@@ -115,6 +123,8 @@ export default function ProductForm() {
   const save = async (e) => {
     e.preventDefault()
     if (!f.title.trim()) return toast('Please enter the product title', 'error')
+    const uploaded = [] // photos sent to storage during this attempt
+    let saving = false
     try {
       const finalImages = []
       const total = images.filter((i) => i.kind === 'new').length
@@ -124,10 +134,13 @@ export default function ProductForm() {
         else {
           n++
           setBusy(`Uploading photo ${n} of ${total}…`)
-          finalImages.push(await uploadVariants(im.compressed, 'products'))
+          const v = await uploadVariants(im.compressed, 'products')
+          uploaded.push(v.path, v.thumb_path)
+          finalImages.push(v)
         }
       }
       setBusy('Saving…')
+      saving = true
       const noPrice = f.price === '' || f.price == null
       const payload = {
         ...(existing ? { id: existing.id } : {}),
@@ -157,6 +170,10 @@ export default function ProductForm() {
       toast(existing ? 'Product updated' : `Product added – code ${productCode(saved.id)}`)
       navigate('/admin/products')
     } catch (err) {
+      // An upload failed before the product was saved: the photos already uploaded are
+      // not used anywhere, so remove them (the next try uploads them again). If saving
+      // itself failed, keep them – the product may have been saved before the connection dropped.
+      if (!saving && uploaded.length) adminApi.removeFiles(uploaded).catch(() => {})
       toast(err.message || 'Could not save', 'error')
     } finally {
       setBusy('')

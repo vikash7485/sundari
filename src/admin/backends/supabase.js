@@ -67,6 +67,17 @@ export async function removeFiles(paths) {
   if (error) console.warn('Could not delete some files', error)
 }
 
+// Public URL -> storage path, e.g. https://x.supabase.co/storage/v1/object/public/media/site/1.webp -> site/1.webp.
+// Other URLs (sample images in /samples, outside links) are not ours to delete.
+const publicPrefix = sb.storage.from(BUCKET).getPublicUrl('_').data.publicUrl.slice(0, -1)
+const pathFromUrl = (url) =>
+  typeof url === 'string' && url.startsWith(publicPrefix) ? decodeURIComponent(url.slice(publicPrefix.length).split('?')[0]) : null
+
+/** For photos saved only as a URL (category photo, logo, hero image). */
+export async function removeByUrl(urls) {
+  await removeFiles(urls.map(pathFromUrl))
+}
+
 const imagePaths = (images = []) => images.flatMap((im) => [im.path, im.thumb_path])
 
 // ---------- Products ----------
@@ -92,7 +103,9 @@ export async function deleteProduct(p) {
 }
 
 export async function deleteSampleProducts() {
-  must(await sb.from('products').delete().eq('is_sample', true))
+  // A sample may have been given real photos – remove those files too.
+  const rows = must(await sb.from('products').delete().eq('is_sample', true).select('images'))
+  await removeFiles(rows.flatMap((r) => imagePaths(r.images)))
 }
 
 // ---------- Categories ----------
@@ -102,8 +115,9 @@ export async function saveCategory(cat, isNew) {
   return must(await sb.from('categories').update(row).eq('slug', cat.slug).select().single())
 }
 
-export async function deleteCategory(slug) {
-  must(await sb.from('categories').delete().eq('slug', slug))
+export async function deleteCategory(cat) {
+  must(await sb.from('categories').delete().eq('slug', cat.slug))
+  if (cat.image) await removeByUrl([cat.image])
 }
 
 // ---------- Settings ----------
@@ -126,7 +140,21 @@ export async function deleteGalleryItem(item) {
 }
 
 export async function deleteSampleGallery() {
-  must(await sb.from('gallery').delete().eq('is_sample', true))
+  const rows = must(await sb.from('gallery').delete().eq('is_sample', true).select('path, thumb_path'))
+  await removeFiles(rows.flatMap((r) => [r.path, r.thumb_path]))
+}
+
+// ---------- Backup ----------
+/** Every row of every table (photos stay in storage; their links are in the rows). */
+export async function exportBackup() {
+  const all = (table, order) => sb.from(table).select('*').order(order).then(must)
+  const [categories, products, gallery, settings] = await Promise.all([
+    all('categories', 'sort'),
+    all('products', 'id'),
+    all('gallery', 'id'),
+    all('settings', 'key'),
+  ])
+  return { categories, products, gallery, settings }
 }
 
 export const resetDemo = null

@@ -2,6 +2,7 @@ import { Link } from 'react-router'
 import { useData } from '../data/DataContext'
 import { useLang } from '../i18n/LanguageContext'
 import { SHOP } from '../config'
+import SafeImg from './SafeImg'
 
 export function Monogram({ className = 'size-11' }) {
   return (
@@ -22,11 +23,11 @@ export default function Logo({ light = false, onClick }) {
   const secondary = lang === 'hi' ? SHOP.name.en : SHOP.name.hi
   return (
     <Link to="/" onClick={onClick} className="flex min-w-0 items-center gap-2.5" aria-label={SHOP.name.en}>
-      {logo ? (
-        <img src={logo} alt="" className="size-11 shrink-0 rounded-full object-cover ring-1 ring-gold/60" />
-      ) : (
-        <Monogram className="size-10 text-[16px] sm:size-11 sm:text-[17px]" />
-      )}
+      <SafeImg
+        src={logo}
+        className="size-11 shrink-0 rounded-full object-cover ring-1 ring-gold/60"
+        fallback={<Monogram className="size-10 text-[16px] sm:size-11 sm:text-[17px]" />}
+      />
       <span className="min-w-0 leading-tight">
         <span
           className={`block truncate font-semibold ${light ? 'text-white' : 'text-maroon'} ${

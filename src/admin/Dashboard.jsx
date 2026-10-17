@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Link } from 'react-router'
 import { AdminPage, Panel, Thumb, useToast } from './ui'
-import { adminApi } from './adminApi'
+import { adminApi, isDemo } from './adminApi'
 import Icon from '../components/Icon'
 import { useData } from '../data/DataContext'
 import { formatDateTime, formatPrice } from '../lib/format'
@@ -16,6 +16,67 @@ function Stat({ label, value, icon, to }) {
       <p className="mt-3 font-display text-3xl font-semibold text-maroon">{value}</p>
       <p className="text-sm text-ink-soft">{label}</p>
     </Link>
+  )
+}
+
+const LAST_BACKUP_KEY = 'sj-last-backup'
+
+function readLastBackup() {
+  try {
+    return localStorage.getItem(LAST_BACKUP_KEY)
+  } catch {
+    return null
+  }
+}
+
+function BackupPanel() {
+  const toast = useToast()
+  const [busy, setBusy] = useState(false)
+  const [last, setLast] = useState(readLastBackup)
+  const daysAgo = last ? Math.floor((Date.now() - new Date(last).getTime()) / 86400000) : null
+  const due = daysAgo == null || daysAgo >= 30
+
+  const download = async () => {
+    setBusy(true)
+    try {
+      const data = await adminApi.exportBackup()
+      const now = new Date().toISOString()
+      const file = { app: 'sundari-jewellers', version: 1, exported_at: now, demo: isDemo, ...data }
+      const url = URL.createObjectURL(new Blob([JSON.stringify(file, null, 2)], { type: 'application/json' }))
+      const a = document.createElement('a')
+      a.href = url
+      a.download = `sundari-backup-${new Date().toLocaleDateString('en-CA')}.json` // local YYYY-MM-DD
+      a.click()
+      setTimeout(() => URL.revokeObjectURL(url), 1000)
+      try {
+        localStorage.setItem(LAST_BACKUP_KEY, now)
+      } catch {
+        /* fine */
+      }
+      setLast(now)
+      toast(`Backup downloaded – ${data.products.length} products, ${data.categories.length} categories, ${data.gallery.length} gallery photos`)
+    } catch (e) {
+      toast(`Could not make the backup: ${e.message}`, 'error')
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  return (
+    <Panel
+      title="Backup"
+      description="Downloads a file with all your products, categories, gallery list, rates and settings. Save it in Google Drive or send it to yourself on WhatsApp. Photos stay in photo storage – the file has their links, so also keep the original photos on your phone."
+      right={
+        <button type="button" onClick={download} disabled={busy} className="btn btn-maroon shrink-0 px-4 py-2 text-sm disabled:opacity-60">
+          <Icon name="download" className="size-4" /> {busy ? 'Preparing…' : 'Download backup'}
+        </button>
+      }
+    >
+      <p className={`text-sm ${due ? 'font-medium text-gold-dark' : 'text-ink-soft'}`}>
+        {last ? `Last backup from this device: ${formatDateTime(last)}` : 'No backup downloaded from this device yet.'}
+        {due && ' · Tip: download a backup once a month.'}
+      </p>
+    </Panel>
   )
 }
 
@@ -161,6 +222,8 @@ export default function Dashboard() {
           )}
         </Panel>
       </div>
+
+      <BackupPanel />
     </AdminPage>
   )
 }

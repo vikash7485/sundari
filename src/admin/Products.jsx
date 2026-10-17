@@ -8,7 +8,7 @@ import { formatPrice, formatWeight } from '../lib/format'
 import { productCode } from '../config'
 
 export default function Products() {
-  const { products, categories, categoryBySlug, refresh } = useData()
+  const { products, categories, categoryBySlug, refresh, failed } = useData()
   const toast = useToast()
   const [sp, setSp] = useSearchParams()
   const [q, setQ] = useState('')
@@ -67,7 +67,11 @@ export default function Products() {
         </select>
       </div>
 
-      {list.length === 0 ? (
+      {failed.includes('products') && products.length === 0 ? (
+        <div className="rounded-2xl border border-dashed border-red-200 bg-white p-10 text-center">
+          <p className="text-red-800">Your products could not be loaded. They are not deleted – tap “Retry” at the top.</p>
+        </div>
+      ) : list.length === 0 ? (
         <div className="rounded-2xl border border-dashed border-gold/60 bg-white p-10 text-center">
           <p className="text-ink-soft">No products found.</p>
           <Link to="/admin/products/new" className="btn btn-maroon mt-4">
