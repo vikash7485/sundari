@@ -1,5 +1,4 @@
-// DEMO MODE ONLY: a tiny database kept in this browser's localStorage, used until
-// Supabase keys are added to .env. Nothing here is visible to other visitors.
+// Local browser storage database.
 import { SEED_CATEGORIES, DEFAULT_SETTINGS, buildSampleProducts, SAMPLE_GALLERY } from '../data/seed'
 
 const KEY = 'sj-demo-db-v1'
@@ -31,7 +30,7 @@ export function writeDb(next) {
   try {
     localStorage.setItem(KEY, JSON.stringify(next))
   } catch {
-    throw new Error('Demo storage is full. Connect Supabase (see README) to store more photos.')
+    throw new Error('Browser storage is full.')
   }
   cache = next
   return next

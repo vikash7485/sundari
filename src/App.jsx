@@ -5,6 +5,7 @@ import { DataProvider } from './data/DataContext'
 import Header from './components/Header'
 import Footer from './components/Footer'
 import FloatingButtons from './components/FloatingButtons'
+import InstallPrompt from './components/InstallPrompt'
 import { LoadNotice } from './components/LoadError'
 import Home from './pages/Home'
 import Collection from './pages/Collection'
@@ -14,7 +15,7 @@ import About from './pages/About'
 import Contact from './pages/Contact'
 import NotFound from './pages/NotFound'
 
-// The admin panel (and the full Supabase client) only downloads when /admin is opened.
+// The admin panel only downloads when /admin is opened.
 const AdminApp = lazy(() => import('./admin/AdminApp'))
 
 function ScrollToTop() {
@@ -35,6 +36,7 @@ function SiteLayout() {
       </main>
       <Footer />
       <FloatingButtons />
+      <InstallPrompt />
     </>
   )
 }

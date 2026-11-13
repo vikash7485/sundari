@@ -39,12 +39,7 @@ function useNoIndex() {
 }
 
 function DemoBanner() {
-  if (!isDemo) return null
-  return (
-    <div className="bg-gold-pale px-4 py-2 text-center text-[0.8rem] text-ink">
-      <strong>Demo mode:</strong> changes are saved only in this browser. Connect Supabase (see README) so every visitor sees your products.
-    </div>
-  )
+  return null
 }
 
 const WRITE_BLOCK = {
@@ -74,7 +69,7 @@ function DataErrorBanner() {
   return (
     <div role="alert" className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1.5 bg-red-50 px-4 py-2.5 text-center text-[0.85rem] text-red-800">
       <span>
-        <strong>Could not load your website data</strong> (no internet, or Supabase is not reachable). Lists may be empty or old, so saving is paused.
+        <strong>Could not load your website data</strong>. Lists may be empty or old, so saving is paused.
       </span>
       <button type="button" onClick={retry} disabled={busy} className="btn btn-maroon px-3 py-1.5 text-xs">
         {busy ? <Spinner className="size-3.5" /> : <Icon name="refresh" className="size-3.5" />} Retry

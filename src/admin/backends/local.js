@@ -1,4 +1,4 @@
-// DEMO MODE admin backend: same functions as supabase.js, stored in this browser only.
+// Admin backend: stored in browser storage.
 import { readDb, writeDb, resetDb } from '../../lib/localDb'
 
 const SESSION_KEY = 'sj-demo-admin'

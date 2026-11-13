@@ -94,10 +94,9 @@ export default function Login({ onLogin }) {
           Log in
         </button>
 
-        {isDemo && (
+        {import.meta.env.DEV && (
           <p className="mt-4 rounded-lg bg-gold-pale px-3 py-2 text-[0.78rem] text-ink-soft">
-            Demo mode (Supabase not connected yet).
-            {import.meta.env.DEV && ' Demo password is set in .env as VITE_DEMO_ADMIN_PASSWORD (default: sundari-demo).'}
+            Admin password is set in .env as VITE_DEMO_ADMIN_PASSWORD (default: sundari-demo).
           </p>
         )}
         <Link to="/" className="mt-5 block text-center text-sm text-maroon underline decoration-gold underline-offset-4">

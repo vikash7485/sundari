@@ -4,6 +4,16 @@
 export const STRINGS = {
   en: {
     nav: { home: 'Home', collection: 'Collection', gallery: 'Gallery', about: 'About', contact: 'Contact' },
+    install: {
+      title: 'Get the Sundari Jewellers app',
+      text: "Add our app to your phone – check today's gold rate and new designs in one tap.",
+      button: 'Install App',
+      later: 'Not now',
+      close: 'Close',
+      iosStep1: 'Tap the Share button {icon} at the bottom of Safari',
+      iosStep2: 'Choose “Add to Home Screen”',
+      gotIt: 'Got it',
+    },
     header: { call: 'Call', menu: 'Menu', close: 'Close', switchLang: 'हिंदी में देखें' },
     hero: {
       eyebrow: 'Gold · Silver · Bridal · Fancy',
@@ -148,6 +158,16 @@ export const STRINGS = {
 
   hi: {
     nav: { home: 'होम', collection: 'कलेक्शन', gallery: 'गैलरी', about: 'हमारे बारे में', contact: 'संपर्क' },
+    install: {
+      title: 'सुन्दरी ज्वेलर्स ऐप डाउनलोड करें',
+      text: 'हमारा ऐप अपने फ़ोन में जोड़ें – आज का सोने का भाव और नई डिज़ाइन एक टैप में देखें।',
+      button: 'ऐप इंस्टॉल करें',
+      later: 'अभी नहीं',
+      close: 'बंद करें',
+      iosStep1: 'Safari में नीचे Share बटन {icon} दबाएँ',
+      iosStep2: '“Add to Home Screen” चुनें',
+      gotIt: 'ठीक है',
+    },
     header: { call: 'कॉल', menu: 'मेनू', close: 'बंद करें', switchLang: 'View in English' },
     hero: {
       eyebrow: 'सोना · चाँदी · ब्राइडल · फैन्सी',

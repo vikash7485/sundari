@@ -1,11 +1,9 @@
-// Picks the Supabase backend when keys are configured, otherwise the in-browser demo.
-import { isDemo } from '../lib/api'
+// Local in-browser data access for the admin panel.
+import * as localBackend from './backends/local.js'
 
-let implPromise
-const impl = () => (implPromise ??= isDemo ? import('./backends/local.js') : import('./backends/supabase.js'))
+export const isDemo = true
 
-// Calls that only read or log in. Every other call changes data and is refused while
-// setWriteBlock() holds a message, so nothing is saved on top of an empty/old copy.
+// Calls that only read or log in.
 const READ_ONLY = new Set(['getUser', 'onAuthChange', 'signIn', 'signOut', 'exportBackup'])
 let writeBlock = null
 export const setWriteBlock = (message) => {
@@ -19,9 +17,8 @@ export const adminApi = new Proxy(
     get: (_, name) =>
       async (...args) => {
         if (writeBlock && !READ_ONLY.has(name)) throw new Error(writeBlock)
-        const mod = await impl()
-        if (typeof mod[name] !== 'function') throw new Error(`adminApi.${String(name)} is not available`)
-        return mod[name](...args)
+        if (typeof localBackend[name] !== 'function') throw new Error(`adminApi.${String(name)} is not available`)
+        return localBackend[name](...args)
       },
   },
 )
@@ -33,7 +30,7 @@ export async function uploadVariants(compressed, folder) {
   try {
     thumb = await adminApi.uploadImage(compressed.thumb.blob, `${folder}/thumbs`, compressed.thumb.ext)
   } catch (e) {
-    await adminApi.removeFiles([full.path]).catch(() => {}) // don't leave half a photo in storage
+    await adminApi.removeFiles([full.path]).catch(() => {})
     throw e
   }
   return {
@@ -45,5 +42,3 @@ export async function uploadVariants(compressed, folder) {
     height: compressed.full.height,
   }
 }
-
-export { isDemo }

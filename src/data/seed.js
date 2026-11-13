@@ -1,5 +1,4 @@
-// Starting data. The same content is in supabase/seed.sql for the live database.
-// Sample products are flagged `is_sample: true` and can be removed in one click from /admin.
+// Starting data. Sample products are flagged `is_sample: true` and can be removed in one click from /admin.
 
 export const SEED_CATEGORIES = [
   { slug: 'necklace-set', name_en: 'Necklace Set', name_hi: 'नेकलेस सेट', sort: 1 },
