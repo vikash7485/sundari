@@ -1,5 +1,26 @@
 // Starting data. Sample products are flagged `is_sample: true` and can be removed in one click from /admin.
 
+// Category tile photos from Unsplash (free for commercial use, unsplash.com/license).
+// Swap any of these for a photo of your own jewellery whenever you have one.
+function unsplash(id, faces = false) {
+  return `https://images.unsplash.com/photo-${id}?w=200&h=200&fit=crop${faces ? '&crop=faces' : ''}&auto=format&q=70`
+}
+const CATEGORY_PHOTOS = {
+  'necklace-set': unsplash('1758995115682-1452a1a9e35b'),
+  earrings: unsplash('1714733831162-0a6e849141be'),
+  rings: unsplash('1598560917807-1bae44bd2be8'),
+  'nose-pin': unsplash('1703514781571-3804a283cb36', true),
+  mangalsutra: unsplash('1787520542687-e2647225dc8f'),
+  bangles: unsplash('1728381031272-ba3f537feadd'),
+  chains: unsplash('1611107683227-e9060eccd846'),
+  pendants: unsplash('1758995115560-59c10d6cc28f'),
+  payal: unsplash('1760163287823-8786a65fd269'),
+  'maang-tikka': unsplash('1760080839074-07e553b0565e', true),
+  'bridal-sets': unsplash('1600685890506-593fdf55949b', true),
+  'silver-items': unsplash('1573408301185-9146fe634ad0'),
+  'mens-jewellery': unsplash('1762505465234-de8b802614d9'),
+}
+
 export const SEED_CATEGORIES = [
   { slug: 'necklace-set', name_en: 'Necklace Set', name_hi: 'नेकलेस सेट', sort: 1 },
   { slug: 'earrings', name_en: 'Earrings (Jhumka / Tops)', name_hi: 'झुमका / टॉप्स', sort: 2 },
@@ -14,7 +35,7 @@ export const SEED_CATEGORIES = [
   { slug: 'bridal-sets', name_en: 'Bridal Sets', name_hi: 'ब्राइडल सेट', sort: 11 },
   { slug: 'silver-items', name_en: 'Silver Items', name_hi: 'चाँदी के सामान', sort: 12 },
   { slug: 'mens-jewellery', name_en: "Men's Jewellery", name_hi: 'पुरुषों के आभूषण', sort: 13 },
-].map((c) => ({ image: null, ...c }))
+].map((c) => ({ image: CATEGORY_PHOTOS[c.slug] ?? null, ...c }))
 
 export const DEFAULT_SETTINGS = {
   rates: { gold24: null, gold22: null, gold18: null, silver: null, updated_at: null },
