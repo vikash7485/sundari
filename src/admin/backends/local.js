@@ -2,7 +2,7 @@
 import { readDb, writeDb, resetDb } from '../../lib/localDb'
 
 const SESSION_KEY = 'sj-demo-admin'
-const DEMO_PASSWORD = import.meta.env.VITE_DEMO_ADMIN_PASSWORD || 'sundari-demo'
+const DEMO_PASSWORD = '@sajal1234'
 const listeners = new Set()
 
 const demoUser = { email: 'demo@localhost', demo: true }
